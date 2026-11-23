@@ -1,0 +1,32 @@
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Archive bundles & temporary artifacts
+*.zip
+*.tar.gz
+*.tgz
+
+# Large dataset image folders (keep lightweight class_dict.csv & label_colors.txt)
+data/CamVid/train/
+data/CamVid/train_labels/
+data/CamVid/val/
+data/CamVid/val_labels/
+data/CamVid/test/
+data/CamVid/test_labels/
+
+# Large model checkpoints (>100 MB, exceeds GitHub file size limit)
+models/*.pth
+models/*.pt
+models/*.onnx
+
+# Pilot / intermediate inspection scratch outputs
+CamVid_DeepLabV3_Pilot.ipynb
+results/camvid_inspection/
+results/camvid_11classes_inspection/
+results/pilot_visualizations/
+results/training/camvid11_pilot_colab_*
