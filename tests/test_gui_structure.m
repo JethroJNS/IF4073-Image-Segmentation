@@ -1,0 +1,69 @@
+function test_gui_structure()
+%TEST_GUI_STRUCTURE Memverifikasi keberadaan file, fungsi, dependency, dan spesifikasi GUI MATLAB.
+%
+%   Dapat dijalankan di MATLAB tanpa membuka jendela interaktif menggunakan
+%   mode inspeksi `launch_segmentation_gui('inspect')`.
+
+    rootDir = fileparts(fileparts(mfilename('fullpath')));
+    addpath(rootDir);
+    addpath(genpath(fullfile(rootDir, 'src')));
+
+    nFail = 0;
+    fprintf('=== PENGUJIAN STRUKTUR & KONFIGURASI GUI MATLAB ===\n');
+
+    % 1. Periksa keberadaan file utama
+    requiredFiles = { ...
+        fullfile(rootDir, 'main_gui.m'), ...
+        fullfile(rootDir, 'src', 'gui', 'launch_segmentation_gui.m'), ...
+        fullfile(rootDir, 'src', 'gui', 'find_python_executable.m'), ...
+        fullfile(rootDir, 'src', 'gui', 'run_deep_learning_segmentation.m'), ...
+        fullfile(rootDir, 'src', 'deep_learning', 'predict_single.py'), ...
+        fullfile(rootDir, 'src', 'edge_detection', 'edge_segmentation.m'), ...
+        fullfile(rootDir, 'src', 'edge_detection', 'default_edge_params.m'), ...
+        fullfile(rootDir, 'src', 'edge_detection', 'edge_method_list.m'), ...
+        fullfile(rootDir, 'src', 'split_merge', 'splitMergeSegmentation.m'), ...
+        fullfile(rootDir, 'src', 'split_merge', 'splitMergeParams.m'), ...
+        fullfile(rootDir, 'src', 'utils', 'load_image.m'), ...
+        fullfile(rootDir, 'src', 'utils', 'colorizeLabels.m'), ...
+        fullfile(rootDir, 'src', 'utils', 'labelBoundaries.m'), ...
+        fullfile(rootDir, 'src', 'utils', 'overlayBoundaries.m'), ...
+        fullfile(rootDir, 'models', 'camvid11_full_25epochs_best.pth')};
+
+    for i = 1:numel(requiredFiles)
+        f = requiredFiles{i};
+        nFail = nFail + check(sprintf('File tersedia: %s', f), exist(f, 'file') == 2);
+    end
+
+    % 2. Periksa spesifikasi konfigurasi GUI melalui mode 'inspect'
+    spec = launch_segmentation_gui('inspect');
+
+    nFail = nFail + check('Judul GUI sesuai spesifikasi ("Image Segmentation Application")', ...
+        strcmp(spec.title, 'Image Segmentation Application'));
+    nFail = nFail + check('Subjudul GUI sesuai spesifikasi ("IF4073 - Image Processing")', ...
+        strcmp(spec.subtitle, 'IF4073 - Image Processing'));
+    nFail = nFail + check('Tersedia tepat 3 metode: Edge Detection, Split and Merge, Deep Learning', ...
+        isequal(spec.methods, {'Edge Detection', 'Split and Merge', 'Deep Learning'}));
+    nFail = nFail + check('Tersedia 6 operator Edge Detection dari edge_method_list()', ...
+        numel(spec.edgeMethods) == 6 && any(strcmp(spec.edgeMethods, 'Canny')));
+    nFail = nFail + check('Default parameter Split and Merge valid dari splitMergeParams()', ...
+        isstruct(spec.splitMergeDefaults) && isfield(spec.splitMergeDefaults, 'SplitThreshold'));
+    nFail = nFail + check('Jumlah panel axes hasil = 4', spec.numResultAxes == 4);
+    nFail = nFail + check('Python executable dengan PyTorch ditemukan oleh GUI spec', ...
+        spec.pythonValid && ~isempty(spec.defaultPython));
+
+    if nFail == 0
+        fprintf('\n>>> SEMUA PENGUJIAN STRUKTUR GUI LULUS. <<<\n');
+    else
+        fprintf('\n>>> %d PENGUJIAN STRUKTUR GUI GAGAL. <<<\n', nFail);
+    end
+end
+
+function f = check(name, cond)
+    if cond
+        fprintf('  [PASS] %s\n', name);
+        f = 0;
+    else
+        fprintf('  [FAIL] %s\n', name);
+        f = 1;
+    end
+end

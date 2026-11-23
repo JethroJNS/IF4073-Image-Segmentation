@@ -30,3 +30,7 @@ results/camvid_inspection/
 results/camvid_11classes_inspection/
 results/pilot_visualizations/
 results/training/camvid11_pilot_colab_*
+
+# GUI cache & single-image test scratch outputs
+results/gui_cache/
+results/single_prediction_test/
